@@ -1,0 +1,10 @@
+{
+  "mode": "readonly",
+  "tools": {
+    "wave_invoice_send": "deny"
+  },
+  "businessIds": [],
+  "rawGraphql": "off",
+  "maxPageSize": 100,
+  "requestTimeoutMs": 30000
+}

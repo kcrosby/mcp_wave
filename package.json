@@ -1,0 +1,25 @@
+{
+  "name": "mcp-wave",
+  "version": "0.1.0",
+  "description": "Lightweight MCP server for the Wave (waveapps.com) GraphQL API with config-controlled permissions",
+  "type": "module",
+  "bin": { "mcp-wave": "dist/index.js" },
+  "main": "dist/index.js",
+  "files": ["dist", "wave-mcp.config.example.json"],
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc --watch",
+    "test": "node --test dist/test/*.test.js"
+  },
+  "engines": { "node": ">=20" },
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "typescript": "^5.5.0"
+  }
+}
