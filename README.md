@@ -93,6 +93,27 @@ Copy `wave-mcp.config.example.json` to `wave-mcp.config.json` and edit it:
 
 The example file is read-only: it enables no write tools. Unknown keys (for example a misspelled `Mode` or `tool`) and unknown tool names are errors, so a typo cannot silently drop a restriction. An invalid config stops the server at startup with `Invalid config <path>: ...`.
 
+### Full Wave Graph API coverage
+
+The public Wave GraphQL API exposes more than the curated MCP wrapper set. This server intentionally ships a focused set of high-value tools for the common read/write operations, but it is not limited to those wrappers. The `wave_graphql` passthrough is the authoritative escape hatch for the full API surface: if `rawGraphql` is enabled and `mode` is `full`, the server can run any GraphQL document accepted by Wave, including operations not represented by a dedicated MCP tool.
+
+This matches the official Wave Rust client coverage, which includes queries for `user`, businesses, customers, vendors, invoices, products, accounts, sales taxes, currencies, countries, account types, and account subtypes, plus mutations for customer/account/product/invoice/sales-tax changes, invoice approval and sending, and money-transaction creation. In other words, the MCP can reach the full Wave Graph API through the passthrough tool even when a specific wrapper is not implemented.
+
+For a full-access test configuration, copy `wave-mcp.config.full.example.json` and adjust the `businessIds` list as needed:
+
+```json
+{
+  "mode": "full",
+  "tools": {},
+  "businessIds": [],
+  "rawGraphql": "full",
+  "maxPageSize": 200,
+  "requestTimeoutMs": 30000
+}
+```
+
+This should be used only for a test business or a sandbox account, because it allows raw GraphQL mutations across the full API surface.
+
 ### How the config file is found
 
 1. `--config <path>` on the command line.
@@ -117,6 +138,16 @@ Read-only bookkeeping assistant for one business:
 { "mode": "readonly", "businessIds": ["QnVzaW5lc3M6..."] }
 ```
 
+Read-only raw GraphQL access, but no write tools or mutations:
+
+```json
+{
+  "mode": "readonly",
+  "rawGraphql": "read",
+  "businessIds": []
+}
+```
+
 Can draft invoices and customers but cannot approve, email, or delete anything:
 
 ```json
@@ -131,6 +162,8 @@ Full access including raw GraphQL (use with a test business first):
 ```json
 { "mode": "full", "rawGraphql": "full" }
 ```
+
+> Important: `rawGraphql: "full"` is only allowed when `mode` is `"full"`. In read-only or readwrite mode, the highest raw GraphQL level is `"read"`.
 
 ## Adding the server to an AI app
 
@@ -300,6 +333,3 @@ Mutation tools take an `input` object passed straight to Wave, so any field in W
 | `Wave error (HTTP 401)` | The token is wrong, expired, or was revoked. |
 | Server does not start in the client | Run `node C:/code/mcp_wave/dist/index.js --config ...` in a terminal with the token set to see the error, and confirm `npm run build` has been run. |
 
-## Status
-
-The GraphQL documents were written from Wave's public schema without live testing. Run against a test business first, and use `wave_graphql` with introspection to confirm any field that errors.
